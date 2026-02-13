@@ -1,0 +1,16 @@
+# 环境与 IDE
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# 向量库与日志（可按需保留或提交）
+chroma_db/
+logs/
+*.log
+
+# 知识库文档（企业内通常单独管理）
+# knowledge_docs/*

@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>企业内部知识库问答</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --secondary: #64748b;
+      --success: #10b981;
+      --error: #ef4444;
+      --bg-gradient-start: #f8fafc;
+      --bg-gradient-end: #e2e8f0;
+      --card-bg: #ffffff;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", "Helvetica Neue", sans-serif;
+      background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      animation: fadeInDown 0.6s ease-out;
+    }
+    
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+    
+    .header .subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .card:hover {
+      box-shadow: var(--shadow-xl);
+      transform: translateY(-2px);
+    }
+    
+    .input-group {
+      position: relative;
+    }
+    
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 1rem 1.25rem;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 1rem;
+      resize: vertical;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      background: #fafafa;
+      color: var(--text-primary);
+    }
+    
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    textarea::placeholder {
+      color: var(--text-secondary);
+      opacity: 0.6;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    
+    button:active::before {
+      width: 300px;
+      height: 300px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
+    }
+    
+    .btn-secondary {
+      background: var(--secondary);
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .btn-secondary:hover:not(:disabled) {
+      background: #475569;
+      transform: translateY(-2px);
+    }
+    
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    .answer-card {
+      animation: fadeInUp 0.5s ease-out;
+      max-width: 100%;
+    }
+    
+    .answer {
+      line-height: 1.85;
+      color: var(--text-primary);
+      font-size: 1.05rem;
+      padding: 0;
+    }
+    
+    .answer p {
+      margin-bottom: 1.25rem;
+      text-align: justify;
+      word-break: break-word;
+    }
+    
+    .answer p:last-child {
+      margin-bottom: 0;
+    }
+    
+    /* 标题样式 */
+    .answer h1, .answer h2, .answer h3, .answer h4 {
+      margin-top: 1.75rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+    
+    .answer h1 {
+      font-size: 1.75rem;
+      border-bottom: 3px solid var(--primary);
+      padding-bottom: 0.5rem;
+    }
+    
+    .answer h2 {
+      font-size: 1.5rem;
+      color: var(--primary);
+      padding-left: 0.75rem;
+      border-left: 4px solid var(--primary);
+    }
+    
+    .answer h3 {
+      font-size: 1.25rem;
+    }
+    
+    /* 列表样式 */
+    .answer ul, .answer ol {
+      margin: 1rem 0 1.25rem 0;
+      padding-left: 2rem;
+      line-height: 1.9;
+    }
+    
+    .answer li {
+      margin-bottom: 0.75rem;
+      padding-left: 0.5rem;
+      position: relative;
+    }
+    
+    .answer ul li::marker {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    .answer ol li {
+      counter-increment: list-counter;
+    }
+    
+    /* 中文编号列表特殊处理 */
+    /* 中文编号列表特殊样式 */
+    .answer li.chinese-number {
+      font-weight: 500;
+      margin-bottom: 1rem;
+      padding: 0.75rem 1rem;
+      background: rgba(99, 102, 241, 0.03);
+      border-radius: 6px;
+      border-left: 3px solid var(--primary);
+      transition: all 0.2s;
+    }
+    
+    .answer li.chinese-number:hover {
+      background: rgba(99, 102, 241, 0.06);
+      transform: translateX(4px);
+    }
+    
+    .answer li.chinese-number strong {
+      color: var(--primary);
+      font-size: 1.1em;
+      background: transparent;
+      padding: 0;
+    }
+    
+    /* 强调文本 */
+    .answer strong {
+      font-weight: 700;
+      color: var(--text-primary);
+      background: linear-gradient(120deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+    }
+    
+    .answer em {
+      font-style: italic;
+      color: var(--text-secondary);
+    }
+    
+    /* 引用块 */
+    .answer blockquote {
+      margin: 1.5rem 0;
+      padding: 1rem 1.25rem;
+      border-left: 4px solid var(--primary);
+      background: rgba(99, 102, 241, 0.05);
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+    }
+    
+    /* 代码块 */
+    .answer code {
+      background: rgba(99, 102, 241, 0.1);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+    
+    .answer pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1.25rem 0;
+    }
+    
+    .answer pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+    }
+    
+    /* 分隔线 */
+    .answer hr {
+      border: none;
+      border-top: 2px solid var(--border);
+      margin: 2rem 0;
+    }
+    
+    /* 表格 */
+    .answer table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    
+    .answer table th,
+    .answer table td {
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    
+    .answer table th {
+      background: rgba(99, 102, 241, 0.1);
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    .answer table tr:nth-child(even) {
+      background: rgba(99, 102, 241, 0.02);
+    }
+    
+    /* 特殊段落样式 - 原则标题 */
+    .answer p.principle-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      padding: 0.75rem 1rem;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+    }
+    
+    .answer p.principle-title strong {
+      background: transparent;
+      padding: 0;
+      color: var(--primary);
+    }
+    
+    /* 优化答案卡片的最大宽度，避免过宽 */
+    .answer-card .answer {
+      max-width: 100%;
+    }
+    
+    @media (min-width: 768px) {
+      .answer-card {
+        max-width: 100%;
+      }
+    }
+    
+    .sources {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid var(--border);
+    }
+    
+    .sources summary {
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 600;
+      user-select: none;
+      padding: 0.5rem 0;
+      transition: color 0.2s;
+    }
+    
+    .sources summary:hover {
+      color: var(--primary);
+    }
+    
+    .sources ul {
+      margin-top: 0.75rem;
+      padding-left: 1.5rem;
+      list-style: none;
+    }
+    
+    .sources li {
+      padding: 0.5rem 0;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      position: relative;
+      padding-left: 1.5rem;
+    }
+    
+    .sources li::before {
+      content: '📄';
+      position: absolute;
+      left: 0;
+    }
+    
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 2rem;
+      color: var(--text-secondary);
+    }
+    
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    .error-card {
+      background: #fef2f2;
+      border: 2px solid #fecaca;
+      color: var(--error);
+      padding: 1.25rem;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .error-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    
+    .success-card {
+      background: #f0fdf4;
+      border: 2px solid #bbf7d0;
+      color: var(--success);
+      padding: 1.25rem;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .success-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    @media (max-width: 640px) {
+      body {
+        padding: 1rem 0.5rem;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .card {
+        padding: 1.5rem;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--primary);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🤖 企业知识库问答助手</h1>
+      <p class="subtitle">
+        基于 RAG 技术的智能问答系统，严格依据企业文档内容回答您的问题
+        <span class="badge">安全可靠</span>
+      </p>
+    </div>
+    
+    <div class="card">
+      <div class="input-group">
+        <textarea id="q" placeholder="💡 请输入您的问题，例如：请假类型与天数、请假流程是怎样的？"></textarea>
+      </div>
+      <div class="button-group">
+        <button id="btn" class="btn-primary">
+          <span>🚀</span>
+          <span>提交问题</span>
+        </button>
+        <button id="rebuildBtn" class="btn-secondary">
+          <span>🔄</span>
+          <span>重建索引</span>
+        </button>
+      </div>
+    </div>
+    
+    <div id="result"></div>
+  </div>
+  
+  <script>
+    const q = document.getElementById('q');
+    const btn = document.getElementById('btn');
+    const rebuildBtn = document.getElementById('rebuildBtn');
+    const result = document.getElementById('result');
+    
+    const esc = t => (t || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    
+    const showLoading = (message = '正在查询…') => {
+      result.innerHTML = `
+        <div class="card loading">
+          <div class="spinner"></div>
+          <span>${message}</span>
+        </div>
+      `;
+    };
+    
+    const showError = (message) => {
+      result.innerHTML = `
+        <div class="card">
+          <div class="error-card">
+            <span class="error-icon">⚠️</span>
+            <span>错误：${esc(message)}</span>
+          </div>
+        </div>
+      `;
+    };
+    
+    const showSuccess = (message) => {
+      result.innerHTML = `
+        <div class="card">
+          <div class="success-card">
+            <span class="success-icon">✅</span>
+            <span>${esc(message)}</span>
+          </div>
+        </div>
+      `;
+    };
+    
+    const formatAnswer = (text) => {
+      if (!text) return '';
+      
+      // 先按行分割处理
+      const lines = text.split('\n');
+      const result = [];
+      let currentList = [];
+      let inList = false;
+      
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        if (!line) {
+          // 空行：结束当前列表
+          if (inList && currentList.length > 0) {
+            result.push('<ul>' + currentList.join('') + '</ul>');
+            currentList = [];
+            inList = false;
+          }
+          continue;
+        }
+        
+        // 检查中文编号（一、二、三、...十、）
+        const chineseMatch = line.match(/^([一二三四五六七八九十])、\s*(.+)$/);
+        if (chineseMatch) {
+          if (!inList) inList = true;
+          const [, num, content] = chineseMatch;
+          currentList.push(`<li class="chinese-number"><strong>${num}、</strong> ${esc(content)}</li>`);
+          continue;
+        }
+        
+        // 检查数字编号（1. 2. 3. ...）
+        const numberMatch = line.match(/^(\d+)\.\s+(.+)$/);
+        if (numberMatch) {
+          if (!inList) inList = true;
+          const [, num, content] = numberMatch;
+          currentList.push(`<li><strong>${num}.</strong> ${esc(content)}</li>`);
+          continue;
+        }
+        
+        // 检查 Markdown 列表项（- 或 *）
+        const bulletMatch = line.match(/^[-*]\s+(.+)$/);
+        if (bulletMatch) {
+          if (!inList) inList = true;
+          currentList.push(`<li>${esc(bulletMatch[1])}</li>`);
+          continue;
+        }
+        
+        // 如果不是列表项，先结束当前列表
+        if (inList && currentList.length > 0) {
+          result.push('<ul>' + currentList.join('') + '</ul>');
+          currentList = [];
+          inList = false;
+        }
+        
+        // 处理标题
+        if (line.startsWith('### ')) {
+          result.push(`<h3>${esc(line.substring(4))}</h3>`);
+          continue;
+        }
+        if (line.startsWith('## ')) {
+          result.push(`<h2>${esc(line.substring(3))}</h2>`);
+          continue;
+        }
+        if (line.startsWith('# ')) {
+          result.push(`<h1>${esc(line.substring(2))}</h1>`);
+          continue;
+        }
+        
+        // 处理引用
+        if (line.startsWith('> ')) {
+          result.push(`<blockquote>${esc(line.substring(2))}</blockquote>`);
+          continue;
+        }
+        
+        // 处理分隔线
+        if (line === '---' || line === '***') {
+          result.push('<hr>');
+          continue;
+        }
+        
+        // 处理普通文本：先转义，再处理 Markdown
+        let processed = esc(line);
+        processed = processed.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        processed = processed.replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, '<em>$1</em>');
+        processed = processed.replace(/`([^`]+)`/g, '<code>$1</code>');
+        
+        // 检查是否是原则标题
+        if (processed.includes('**"十要"原则**') || 
+            processed.includes('**"十不准"原则**') ||
+            /<strong>.*原则<\/strong>/.test(processed)) {
+          result.push(`<p class="principle-title">${processed}</p>`);
+        } else {
+          result.push(`<p>${processed}</p>`);
+        }
+      }
+      
+      // 处理剩余的列表
+      if (inList && currentList.length > 0) {
+        result.push('<ul>' + currentList.join('') + '</ul>');
+      }
+      
+      return result.join('');
+    };
+    
+    btn.onclick = async () => {
+      const question = q.value.trim();
+      if (!question) {
+        q.focus();
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;"></span><span>查询中...</span>';
+      showLoading('正在检索知识库并生成回答…');
+      
+      try {
+        const r = await fetch('/api/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question })
+        });
+        
+        const data = await r.json();
+        
+        if (!r.ok) {
+          throw new Error(data.detail || '请求失败');
+        }
+        
+        let html = '<div class="card answer-card">';
+        html += `<div class="answer">${formatAnswer(data.answer)}</div>`;
+        
+        if (data.sources && data.sources.length) {
+          html += '<details class="sources">';
+          html += '<summary>📚 参考来源 (' + data.sources.length + ')</summary>';
+          html += '<ul>';
+          data.sources.forEach(s => {
+            html += '<li>' + esc(s.filename || s.source || '未知来源') + '</li>';
+          });
+          html += '</ul></details>';
+        }
+        
+        html += '</div>';
+        result.innerHTML = html;
+        
+      } catch (e) {
+        showError(e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>🚀</span><span>提交问题</span>';
+      }
+    };
+    
+    rebuildBtn.onclick = async () => {
+      rebuildBtn.disabled = true;
+      rebuildBtn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;"></span><span>重建中...</span>';
+      showLoading('正在重建知识库索引，请稍候…');
+      
+      try {
+        const r = await fetch('/api/rebuild', { method: 'POST' });
+        const data = await r.json();
+        
+        if (!r.ok) {
+          throw new Error(data.detail || '重建失败');
+        }
+        
+        showSuccess('索引已重建完成！现在可以重新提问了。');
+        
+      } catch (e) {
+        showError(e.message);
+      } finally {
+        rebuildBtn.disabled = false;
+        rebuildBtn.innerHTML = '<span>🔄</span><span>重建索引</span>';
+      }
+    };
+    
+    // 支持 Enter + Ctrl/Cmd 提交
+    q.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        btn.click();
+      }
+    });
+  </script>
+</body>
+</html>
